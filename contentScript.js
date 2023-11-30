@@ -3,36 +3,54 @@ console.log("Content script");
 function login() {
     console.log('Función login() llamada');
 
-    const email = "fmoreno@coorditanques.com";
-    const usernameInput = document.getElementById('i0116');
+    const email = "INGRESE SU CORREO";
     const signInButton = document.getElementById('idSIButton9');
+    const displayNameElement = document.getElementById('displayName');
 
-    if (usernameInput && signInButton) {
-        if (usernameInput.value === "") {
-            // Estamos en la pantalla de usuario, llena el campo y hace clic en el botón "Siguiente"
+    function fillPassword() {
+        const passwordInput = document.getElementById('i0118');
+        if (passwordInput) {
+            console.log('Función fillPassword() llamada');
+            passwordInput.value = "INGRESE SU CONTRASEÑA";
+            passwordInput.dispatchEvent(new Event('input'));
+
+            // Intentar hacer clic en el botón de inicio de sesión después de un breve retraso
+            setTimeout(() => {
+                const signInButtonAfterPassword = document.getElementById('idSIButton9');
+                if (signInButtonAfterPassword) {
+                    signInButtonAfterPassword.click();
+                    console.log("Inicio de sesión completado");
+                } else {
+                    console.log("Botón Iniciar Sesión después de ingresar la contraseña no encontrado");
+                }
+            }, 500);
+        } else {
+            console.log("Campo de contraseña no encontrado");
+        }
+    }
+
+    // Verificar si ya se hizo clic en el correo y estamos en la pantalla de ingresar contraseña
+    if (displayNameElement && signInButton) {
+        fillPassword();
+    } else {
+        // Estamos en la pantalla de usuario, llena el campo y hace clic en el botón "Siguiente"
+        const usernameInput = document.getElementById('i0116');
+        if (usernameInput && signInButton) {
             usernameInput.value = email;
             usernameInput.dispatchEvent(new Event('change'));
             signInButton.click();
             console.log("Haciendo clic en Siguiente");
-        } else {
-            // Estamos en la pantalla de contraseña, mueve la declaración de passwordInput aquí
-            const passwordInput = document.getElementById('i0118');
-            if (passwordInput && passwordInput.getAttribute('aria-required') === 'true' && passwordInput.value === "") {
-                // Llena el campo de contraseña
-                passwordInput.value = "Diople71.com";
-                passwordInput.dispatchEvent(new Event('input'));
 
-                // Intentar hacer clic en el botón de inicio de sesión después de un breve retraso
-                setTimeout(() => {
-                    const signInButtonAfterPassword = document.getElementById('idSIButton9');
-                    if (signInButtonAfterPassword) {
-                        signInButtonAfterPassword.click();
-                        console.log("Inicio de sesión completado");
-                    } else {
-                        console.log("Botón Iniciar Sesión después de ingresar la contraseña no encontrado");
-                    }
-                }, 500);
-            }
+            // Esperar a que la pantalla de contraseña esté disponible antes de continuar
+            const intervalId = setInterval(() => {
+                const passwordInput = document.getElementById('i0118');
+                if (passwordInput) {
+                    clearInterval(intervalId);
+                    fillPassword();
+                }
+            }, 500);
+        } else {
+            console.log("Elementos no encontrados");
         }
     }
 }
